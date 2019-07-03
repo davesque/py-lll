@@ -51,7 +51,7 @@ setup(
     long_description_content_type='text/markdown',
     author='The Ethereum Foundation',
     author_email='snakecharmers@ethereum.org',
-    url='https://github.com/ethereum/py-lll',
+    url='https://github.com/davesque/py-lll',
     include_package_data=True,
     python_requires='>=3.6, <4',
     extras_require=extras_require,
