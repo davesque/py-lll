@@ -13,13 +13,12 @@ used as an IR (intermediate representation) during compilation of contracts
 written in the Vyper smart contract language. The py-lll project implements
 the variety of LLL used as an IR by Vyper.
 
-This project is intended to provide the following::
+This project is intended to provide the following:
 
 * A compiler for contracts written in LLL
 * Documentation of LLL and its features
 * A maximally transparent and maintainable implementation of LLL
-* A flavor of LLL useful as an IR for higher-level smart contract
-  languages
+* A flavor of LLL useful as an IR for higher-level smart contract languages
 
 To fulfill these goals, py-lll favors simplicity over expressiveness.
 
