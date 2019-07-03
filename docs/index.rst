@@ -1,7 +1,7 @@
-<PROJECT_NAME>
+py-lll
 ==============================
 
-<SHORT_DESCRIPTION>
+An LLL compiler for Python.
 
 Contents
 --------
@@ -9,7 +9,7 @@ Contents
 .. toctree::
     :maxdepth: 3
 
-    <MODULE_NAME>
+    lll
     releases
 
 

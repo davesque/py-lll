@@ -1,25 +1,25 @@
-# <PROJECT_NAME>
+# py-lll
 
-[![Join the chat at https://gitter.im/ethereum/<REPO_NAME>](https://badges.gitter.im/ethereum/<REPO_NAME>.svg)](https://gitter.im/ethereum/<REPO_NAME>?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://circleci.com/gh/ethereum/<REPO_NAME>.svg?style=shield)](https://circleci.com/gh/ethereum/<REPO_NAME>)
-[![PyPI version](https://badge.fury.io/py/<PYPI_NAME>.svg)](https://badge.fury.io/py/<PYPI_NAME>)
-[![Python versions](https://img.shields.io/pypi/pyversions/<PYPI_NAME>.svg)](https://pypi.python.org/pypi/<PYPI_NAME>)
-[![Docs build](https://readthedocs.org/projects/<RTD_NAME>/badge/?version=latest)](http://<RTD_NAME>.readthedocs.io/en/latest/?badge=latest)
+[![Join the chat at https://gitter.im/ethereum/py-lll](https://badges.gitter.im/ethereum/py-lll.svg)](https://gitter.im/ethereum/py-lll?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://circleci.com/gh/ethereum/py-lll.svg?style=shield)](https://circleci.com/gh/ethereum/py-lll)
+[![PyPI version](https://badge.fury.io/py/py-lll.svg)](https://badge.fury.io/py/py-lll)
+[![Python versions](https://img.shields.io/pypi/pyversions/py-lll.svg)](https://pypi.python.org/pypi/py-lll)
+[![Docs build](https://readthedocs.org/projects/py-lll/badge/?version=latest)](http://py-lll.readthedocs.io/en/latest/?badge=latest)
    
 
-<SHORT_DESCRIPTION>
+An LLL compiler for Python.
 
-Read more in the [documentation on ReadTheDocs](https://<RTD_NAME>.readthedocs.io/). [View the change log](https://<RTD_NAME>.readthedocs.io/en/latest/releases.html).
+Read more in the [documentation on ReadTheDocs](https://py-lll.readthedocs.io/). [View the change log](https://py-lll.readthedocs.io/en/latest/releases.html).
 
 ## Quickstart
 
 ```sh
-pip install <PYPI_NAME>
+pip install py-lll
 ```
 
 ## Developer Setup
 
-If you would like to hack on <REPO_NAME>, please check out the [Snake Charmers
+If you would like to hack on py-lll, please check out the [Snake Charmers
 Tactical Manual](https://github.com/ethereum/snake-charmers-tactical-manual)
 for information on how we do:
 
@@ -33,8 +33,8 @@ for information on how we do:
 You can set up your dev environment with:
 
 ```sh
-git clone git@github.com:ethereum/<REPO_NAME>.git
-cd <REPO_NAME>
+git clone git@github.com:ethereum/py-lll.git
+cd py-lll
 virtualenv -p python3 venv
 . venv/bin/activate
 pip install -e .[dev]
@@ -48,7 +48,7 @@ Show flake8 errors on file change:
 
 ```sh
 # Test flake8
-when-changed -v -s -r -1 <MODULE_NAME>/ tests/ -c "clear; flake8 <MODULE_NAME> tests && echo 'flake8 success' || echo 'error'"
+when-changed -v -s -r -1 lll/ tests/ -c "clear; flake8 lll tests && echo 'flake8 success' || echo 'error'"
 ```
 
 Run multi-process tests in one command, but without color:
@@ -64,7 +64,7 @@ Run in one thread, with color and desktop notifications:
 
 ```sh
 cd venv
-ptw --onfail "notify-send -t 5000 'Test failure ⚠⚠⚠⚠⚠' 'python 3 test on <REPO_NAME> failed'" ../tests ../<MODULE_NAME>
+ptw --onfail "notify-send -t 5000 'Test failure ⚠⚠⚠⚠⚠' 'python 3 test on py-lll failed'" ../tests ../lll
 ```
 
 ### Release setup
