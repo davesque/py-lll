@@ -7,8 +7,8 @@ from setuptools import (
 
 extras_require = {
     'test': [
-        "pytest==3.3.2",
-        "pytest-xdist",
+        "pytest>=4.4.0",
+        "pytest-xdist>=1.29.0",
         "tox>=2.9.1,<3",
     ],
     'lint': [
