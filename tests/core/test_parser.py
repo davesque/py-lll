@@ -1,3 +1,5 @@
+import pprint
+
 import pytest
 
 from lll.parser import (
@@ -6,7 +8,11 @@ from lll.parser import (
 )
 
 
-def test_parseable_files_yield_result(parseable_lll_file):
+def get_sexp_repr(obj):
+    return pprint.pformat(obj, indent=1, width=80, depth=None, compact=False) + '\n'
+
+
+def test_parseable_files_are_parseable(parseable_lll_file):
     with open(parseable_lll_file, 'r') as f:
         parse_s_exp(f)
 
@@ -28,3 +34,10 @@ def test_parsing_string_literals(get_parsed_fixture):
     assert parsed[5][1] == 'test newline\nin string'
     assert parsed[6][1] == 'test escaped newline \n in string'
     assert parsed[7][1] == 'test escaped tab \t in string'
+
+
+def test_parsing_ENS(get_parsed_fixture, get_fixture_contents):
+    parsed = get_parsed_fixture('ENS.lll.lisp')
+    parsed_repr = get_fixture_contents('ENS.lll.lisp.repr')
+
+    assert get_sexp_repr(parsed) == parsed_repr
