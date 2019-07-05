@@ -29,6 +29,11 @@ def _open_fixture_file(filename, *args):
         yield f
 
 
+def _get_fixture_contents(filename):
+    with _open_fixture_file(filename, 'r') as f:
+        return f.read()
+
+
 @pytest.fixture(
     params=FIXTURES,
     ids=get_fixture_path_id,
@@ -51,9 +56,13 @@ def open_fixture_file():
 
 
 @pytest.fixture
+def get_fixture_contents():
+    return _get_fixture_contents
+
+
+@pytest.fixture
 def get_parsed_fixture():
     def _get_parsed_fixture(filename):
-        with _open_fixture_file(filename, 'r') as f:
-            return parse_s_exp(f)
+        return parse_s_exp(_get_fixture_contents(filename))
 
     return _get_parsed_fixture
