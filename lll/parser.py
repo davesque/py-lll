@@ -54,7 +54,7 @@ class ParseBuffer:
             self._handle_char(char)
 
 
-class symbol(str):
+class Symbol(str):
     """
     String subclass that represents a parsed symbol (unquoted string) in an
     s-expression. For example, in the following s-expression
@@ -73,7 +73,7 @@ def _parse_symbol_or_int(word: str) -> Union[int, str]:
     try:
         return int(word)
     except ValueError:
-        return symbol(word)
+        return Symbol(word)
 
 
 def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
