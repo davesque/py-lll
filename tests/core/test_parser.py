@@ -6,12 +6,64 @@ from lll.exceptions import (
     ParseError,
 )
 from lll.parser import (
+    ParseBuffer,
     parse_s_exp,
 )
 
 
 def get_sexp_repr(obj):
     return pprint.pformat(obj, indent=1, width=80, depth=None, compact=False) + '\n'
+
+
+def test_parse_buffer_yields_source_code_characters(get_fixture_contents):
+    source_code = get_fixture_contents('string_literals.lll.lisp')
+    buf_it = iter(ParseBuffer(source_code))
+
+    res = []
+    while True:
+        try:
+            res.append(next(buf_it))
+        except StopIteration:
+            break
+
+    assert ''.join(res) == source_code
+
+
+def test_parse_buffer_tracks_offsets(get_fixture_contents):
+    source_code = get_fixture_contents('string_literals.lll.lisp')
+
+    buf = ParseBuffer(source_code)
+    buf_it = iter(buf)
+
+    res = []
+    for _ in range(14):
+        res.append(next(buf_it))
+
+    assert ''.join(res) == '(foo "1234" 1)'
+    assert buf.line_offset == 0
+    assert buf.col_offset == 13
+
+    res.append(next(buf_it))
+
+    assert res[-1] == '\n'
+    assert buf.line_offset == 0
+    assert buf.col_offset == 14
+
+    res.append(next(buf_it))
+
+    assert res[-1] == '('
+    assert buf.line_offset == 1
+    assert buf.col_offset == 0
+
+    while True:
+        try:
+            res.append(next(buf_it))
+        except StopIteration:
+            break
+
+    assert ''.join(res) == source_code
+    assert buf.line_offset == 9
+    assert buf.col_offset == 0
 
 
 def test_parseable_files_are_parseable(parseable_lll_file):
