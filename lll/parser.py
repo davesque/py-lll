@@ -13,7 +13,7 @@ from lll.exceptions import (
 )
 
 
-SExprList = List[Union[int, str, Any]]
+SExprList = List[Union[int, str, 'Symbol', Any]]
 
 
 WORD_SEPARATORS = {' ', '\t', '\n'}
@@ -97,7 +97,7 @@ PREFIX_TO_INT_BASE = {
 DIGIT_CHARS = set('0123456789')
 
 
-def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, str]:
+def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, Symbol]:
     base: Optional[int]
     if word[0] in DIGIT_CHARS:
         # Default integer base is 10
