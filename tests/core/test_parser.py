@@ -98,6 +98,45 @@ def test_parse_symbol_or_int_yields_ints(input, expected):
     assert _parse_symbol_or_int(None, input) == expected
 
 
+@pytest.mark.parametrize(
+    'input',
+    (
+        'foo',
+        '-foo',
+        '-',
+        'x',
+        '*',
+        'seq',
+        'camelCase',
+        'dash-case',
+    ),
+)
+def test_parse_symbol_or_int_yields_symbols(input):
+    assert _parse_symbol_or_int(None, input) == input
+
+
+@pytest.mark.parametrize(
+    'input,match_exc_msg',
+    (
+        ('0aaa', "base 10: '0aaa'"),
+        ('-0aaa', "base 10: '-0aaa'"),
+        ('0xxf', "base 16: '0xxf'"),
+        ('-0xxf', "base 16: '-0xxf'"),
+        ('0oxf', "base 8: '0oxf'"),
+        ('-0oxf', "base 8: '-0oxf'"),
+        ('0bxf', "base 2: '0bxf'"),
+        ('-0bxf', "base 2: '-0bxf'"),
+    ),
+)
+def test_parse_symbol_or_int_raises_errors(input, match_exc_msg):
+    buf = ParseBuffer(input)
+    for char in buf:
+        pass
+
+    with pytest.raises(ParseError, match=match_exc_msg):
+        assert _parse_symbol_or_int(buf, input) == match_exc_msg
+
+
 def test_parseable_files_are_parseable(parseable_lll_file):
     with open(parseable_lll_file, 'r') as f:
         parse_s_exp(f)
