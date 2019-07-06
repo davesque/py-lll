@@ -18,22 +18,22 @@ WORD_SEPARATORS = {' ', '\t', '\n'}
 class ParseError(Exception):
     msg: str
     source_code: str
-    line_no: int
-    col_no: int
+    line_offset: int
+    col_offset: int
     mark_size: int
     file_name: Optional[str]
 
     def __init__(self,
                  msg: str,
                  source_code: str,
-                 line_no: int,
-                 col_no: int,
+                 line_offset: int,
+                 col_offset: int,
                  mark_size: int = 1,
                  file_name: str = None):
         self.msg = msg
         self.source_code = source_code
-        self.line_no = line_no
-        self.col_no = col_no
+        self.line_offset = line_offset
+        self.col_offset = col_offset
         self.mark_size = mark_size
         self.file_name = file_name
 
@@ -43,13 +43,13 @@ class ParseError(Exception):
         else:
             prefix = 'line '
 
-        line_off = self.line_no - 1
-        col_off = self.col_no - 1
+        line = self.source_code.splitlines()[self.line_offset]
+        mark = ' ' * self.col_offset + '^' * self.mark_size
 
-        line = self.source_code.splitlines()[line_off]
-        mark = ' ' * col_off + '^' * self.mark_size
+        line_no = self.line_offset + 1
+        col_no = self.col_offset + 1
 
-        return f'{prefix}{self.line_no}:{self.col_no}: {self.msg}\n{line}\n{mark}'
+        return f'{prefix}{line_no}:{col_no}: {self.msg}\n{line}\n{mark}'
 
 
 class ParseBuffer:
@@ -57,12 +57,12 @@ class ParseBuffer:
     Used to iterate over source code to be parsed while tracking parsing
     position.
     """
-    __slots__ = ('source_code', 'file_name', 'line_no', 'col_no')
+    __slots__ = ('source_code', 'file_name', 'line_offset', 'col_offset')
 
     source_code: str
     file_name: Optional[str]
-    line_no: int
-    col_no: int
+    line_offset: int
+    col_offset: int
 
     def __init__(self,
                  str_or_buffer: Union[str, TextIO],
@@ -77,15 +77,15 @@ class ParseBuffer:
         self.file_name = file_name
 
         # Parsing position
-        self.line_no = 1
-        self.col_no = 1
+        self.line_offset = 0
+        self.col_offset = 0
 
     def _handle_char(self, char: str) -> None:
         if char == '\n':
-            self.line_no += 1
-            self.col_no = 1
+            self.line_offset += 1
+            self.col_offset = 0
         else:
-            self.col_no += 1
+            self.col_offset += 1
 
     def __iter__(self) -> Iterator[str]:
         for char in self.source_code:
@@ -96,8 +96,8 @@ class ParseBuffer:
         raise ParseError(
             msg,
             self.source_code,
-            self.line_no,
-            self.col_no - reverse_mark_size,
+            self.line_offset,
+            self.col_offset - reverse_mark_size,
             mark_size=reverse_mark_size,
             file_name=self.file_name,
         )
