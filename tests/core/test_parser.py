@@ -19,7 +19,7 @@ def get_sexp_repr(obj):
 def test_parse_buffer_yields_source_code_characters(get_fixture_contents):
     source_code = get_fixture_contents('string_literals.lll.lisp')
 
-    buf = iter(ParseBuffer(source_code))
+    buf = ParseBuffer(source_code)
 
     res = []
     for char in buf:
