@@ -71,7 +71,14 @@ class Symbol(str):
 
 def _parse_symbol_or_int(word: str) -> Union[int, str]:
     try:
-        return int(word)
+        if word.startswith('0x'):
+            return int(word, 16)
+        elif word.startswith('0o'):
+            return int(word, 8)
+        elif word.startswith('0b'):
+            return int(word, 2)
+        else:
+            return int(word)
     except ValueError:
         return Symbol(word)
 
