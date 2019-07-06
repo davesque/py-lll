@@ -7,6 +7,7 @@ from lll.exceptions import (
 )
 from lll.parser import (
     ParseBuffer,
+    _parse_symbol_or_int,
     parse_s_exp,
 )
 
@@ -62,6 +63,39 @@ def test_parse_buffer_tracks_offsets(get_fixture_contents):
     assert ''.join(res) == source_code
     assert buf.line_offset == 9
     assert buf.col_offset == 0
+
+
+@pytest.mark.parametrize(
+    'input,expected',
+    (
+        ('0', 0),
+        ('1', 1),
+        ('255', 255),
+        ('-0', 0),
+        ('-1', -1),
+        ('-255', -255),
+        ('0x0', 0),
+        ('0x1', 1),
+        ('0xff', 255),
+        ('-0x0', 0),
+        ('-0x1', -1),
+        ('-0xff', -255),
+        ('0o0', 0),
+        ('0o1', 1),
+        ('0o377', 255),
+        ('-0o0', 0),
+        ('-0o1', -1),
+        ('-0o377', -255),
+        ('0b0', 0),
+        ('0b1', 1),
+        ('0b11111111', 255),
+        ('-0b0', 0),
+        ('-0b1', -1),
+        ('-0b11111111', -255),
+    ),
+)
+def test_parse_symbol_or_int_yields_ints(input, expected):
+    assert _parse_symbol_or_int(None, input) == expected
 
 
 def test_parseable_files_are_parseable(parseable_lll_file):

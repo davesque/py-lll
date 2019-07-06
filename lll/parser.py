@@ -89,26 +89,38 @@ class Symbol(str):
         return str(self)
 
 
+DIGIT_CHARS = set('0123456789')
 PREFIX_TO_INT_BASE = {
     '0x': 16,
     '0o': 8,
     '0b': 2,
+    '-0x': 16,
+    '-0o': 8,
+    '-0b': 2,
 }
-DIGIT_CHARS = set('0123456789')
 
 
 def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, Symbol]:
-    base: Optional[int]
-    if word[0] in DIGIT_CHARS:
-        # Default integer base is 10
-        base = PREFIX_TO_INT_BASE.get(word[:2], 10)
+    try:
+        is_int = (
+            word[0] in DIGIT_CHARS or
+            (word[0] == '-' and word[1] in DIGIT_CHARS)
+        )
+    except IndexError:
+        is_int = False
+
+    if not is_int:
+        return Symbol(word)
+
+    # Default integer base is 10
+    if word[0] == '-':
+        base = PREFIX_TO_INT_BASE.get(word[:3], 10)
     else:
-        base = None
+        base = PREFIX_TO_INT_BASE.get(word[:2], 10)
 
     try:
-        if base is not None:
-            # Try to parse this word as an integer with the appropriate base
-            return int(word, base)
+        # Try to parse this word as an integer with the appropriate base
+        int_val = int(word, base)
     except ValueError:
         buf.raise_error(
             f'invalid literal for int with base {base}: {repr(word)}',
@@ -116,8 +128,7 @@ def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, Symbol]:
             mark_size=len(word),
         )
 
-    # Assume the word is a symbol
-    return Symbol(word)
+    return int_val
 
 
 def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
