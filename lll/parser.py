@@ -17,7 +17,7 @@ WORD_SEPARATORS = {' ', '\t', '\n'}
 
 class ParseError(Exception):
     msg: str
-    source_code: str
+    source_lines: List[str]
     line_offset: int
     col_offset: int
     mark_size: int
@@ -31,7 +31,7 @@ class ParseError(Exception):
                  mark_size: int = 1,
                  file_name: str = None):
         self.msg = msg
-        self.source_code = source_code
+        self.source_lines = source_code.splitlines()
         self.line_offset = line_offset
         self.col_offset = col_offset
         self.mark_size = mark_size
@@ -43,7 +43,7 @@ class ParseError(Exception):
         else:
             prefix = 'line '
 
-        line = self.source_code.splitlines()[self.line_offset]
+        line = self.source_lines[self.line_offset]
         mark = ' ' * self.col_offset + '^' * self.mark_size
 
         line_no = self.line_offset + 1
