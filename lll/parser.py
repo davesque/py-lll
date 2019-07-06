@@ -104,12 +104,16 @@ class ParseBuffer:
             yield char
             self._handle_char(char)
 
-    def raise_parse_error(self, msg: str, mark_size: int = 1) -> None:
+    def raise_parse_error(self,
+                          msg: str,
+                          line_offset: int = None,
+                          col_offset: int = None,
+                          mark_size: int = 1) -> None:
         raise ParseError(
             msg,
             self.source_code,
-            self.line_offset,
-            self.col_offset,
+            self.line_offset if line_offset is None else line_offset,
+            self.col_offset if col_offset is None else col_offset,
             mark_size=mark_size,
             file_name=self.file_name,
         )
@@ -154,6 +158,7 @@ def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, str]:
     except ValueError:
         buf.raise_parse_error(
             f'invalid literal for int with base {base}: {repr(word)}',
+            col_offset=buf.col_offset - 1,
             mark_size=len(word),
         )
 
