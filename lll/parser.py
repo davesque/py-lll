@@ -53,7 +53,10 @@ class ParseError(Exception):
             prefix = 'line '
 
         line = self.source_lines[self.line_offset]
-        mark = ' ' * self.col_offset + '^' * self.mark_size
+
+        # Error mark reaches back from column offset
+        mark = ' ' * (self.col_offset - self.mark_size + 1)
+        mark += '^' * self.mark_size
 
         line_no = self.line_offset + 1
         col_no = self.col_offset + 1
@@ -101,13 +104,13 @@ class ParseBuffer:
             yield char
             self._handle_char(char)
 
-    def raise_parse_error(self, msg: str, reverse_mark_size: int = 1) -> None:
+    def raise_parse_error(self, msg: str, mark_size: int = 1) -> None:
         raise ParseError(
             msg,
             self.source_code,
             self.line_offset,
-            self.col_offset - reverse_mark_size,
-            mark_size=reverse_mark_size,
+            self.col_offset,
+            mark_size=mark_size,
             file_name=self.file_name,
         )
 
@@ -151,7 +154,7 @@ def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, str]:
     except ValueError:
         buf.raise_parse_error(
             f'invalid literal for int with base {base}: {repr(word)}',
-            reverse_mark_size=len(word),
+            mark_size=len(word),
         )
 
     # Assume the word is a symbol
