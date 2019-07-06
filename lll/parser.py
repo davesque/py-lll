@@ -21,8 +21,8 @@ WORD_SEPARATORS = {' ', '\t', '\n'}
 
 class ParseBuffer:
     """
-    A buffer that iterates a source code string character by character while
-    tracking the line and column offsets into the string.
+    A buffer that iterates over a source code string character by character
+    while tracking the line and column offsets into the string.
     """
     __slots__ = ('source_code', 'file_name', 'line_offset', 'col_offset')
 
