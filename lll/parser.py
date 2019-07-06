@@ -32,8 +32,17 @@ class ParseError(Exception):
                  file_name: str = None):
         self.msg = msg
         self.source_lines = source_code.splitlines()
-        self.line_offset = line_offset
-        self.col_offset = col_offset
+
+        # Manually resolve negative offsets for error messages
+        if line_offset < 0:
+            self.line_offset = len(self.source_lines) + line_offset
+        else:
+            self.line_offset = line_offset
+        if col_offset < 0:
+            self.col_offset = len(self.source_lines[line_offset]) + col_offset
+        else:
+            self.col_offset = col_offset
+
         self.mark_size = mark_size
         self.file_name = file_name
 
