@@ -16,26 +16,65 @@ WORD_SEPARATORS = {' ', '\t', '\n'}
 
 
 class ParseError(Exception):
-    pass
+    msg: str
+    source_code: str
+    line_no: int
+    col_no: int
+    mark_size: int
+    file_name: Optional[str]
+
+    def __init__(self,
+                 msg: str,
+                 source_code: str,
+                 line_no: int,
+                 col_no: int,
+                 mark_size: int = 1,
+                 file_name: str = None):
+        self.msg = msg
+        self.source_code = source_code
+        self.line_no = line_no
+        self.col_no = col_no
+        self.mark_size = mark_size
+        self.file_name = file_name
+
+    def __str__(self) -> str:
+        if self.file_name is not None:
+            prefix = self.file_name + ':'
+        else:
+            prefix = 'line '
+
+        line_off = self.line_no - 1
+        col_off = self.col_no - 1
+
+        line = self.source_code.splitlines()[line_off]
+        mark = ' ' * col_off + '^' * self.mark_size
+
+        return f'{prefix}{self.line_no}:{self.col_no}: {self.msg}\n{line}\n{mark}'
 
 
 class ParseBuffer:
     """
-    Used to iterate over content to be parsed while tracking parsing position.
+    Used to iterate over source code to be parsed while tracking parsing
+    position.
     """
-    __slots__ = ('content', 'line_no', 'col_no')
+    __slots__ = ('source_code', 'file_name', 'line_no', 'col_no')
 
-    content: str
+    source_code: str
+    file_name: Optional[str]
     line_no: int
     col_no: int
 
-    def __init__(self, str_or_buffer: Union[str, TextIO]):
+    def __init__(self,
+                 str_or_buffer: Union[str, TextIO],
+                 file_name: str = None):
         if isinstance(str_or_buffer, str):
-            self.content = str_or_buffer
+            self.source_code = str_or_buffer
         elif isinstance(str_or_buffer, io.TextIOWrapper):
-            self.content = str_or_buffer.read()
+            self.source_code = str_or_buffer.read()
         else:
             raise ValueError('Unsupported input type for buffer')
+
+        self.file_name = file_name
 
         # Parsing position
         self.line_no = 1
@@ -49,9 +88,20 @@ class ParseBuffer:
             self.col_no += 1
 
     def __iter__(self) -> Iterator[str]:
-        for char in self.content:
+        for char in self.source_code:
             yield char
             self._handle_char(char)
+
+    def raise_parse_error(self, msg: str, reverse_mark_size: int = 1) -> None:
+        raise ParseError(
+            msg,
+            self.source_code,
+            self.line_no,
+            self.col_no - reverse_mark_size,
+            mark_size=reverse_mark_size,
+            file_name=self.file_name,
+        )
+
 
 
 class Symbol(str):
@@ -69,18 +119,34 @@ class Symbol(str):
         return str(self)
 
 
-def _parse_symbol_or_int(word: str) -> Union[int, str]:
+PREFIX_TO_INT_BASE = {
+    '0x': 16,
+    '0o': 8,
+    '0b': 2,
+}
+DIGIT_CHARS = set('0123456789')
+
+
+def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, str]:
+    base: Optional[int]
+    if word[0] in DIGIT_CHARS:
+        # Default integer base is 10
+        base = PREFIX_TO_INT_BASE.get(word[:2], 10)
+    else:
+        base = None
+
     try:
-        if word.startswith('0x'):
-            return int(word, 16)
-        elif word.startswith('0o'):
-            return int(word, 8)
-        elif word.startswith('0b'):
-            return int(word, 2)
-        else:
-            return int(word)
+        if base is not None:
+            # Try to parse this word as an integer with the appropriate base
+            return int(word, base)
     except ValueError:
-        return Symbol(word)
+        buf.raise_parse_error(
+            f'invalid literal for int with base {base}: {repr(word)}',
+            reverse_mark_size=len(word),
+        )
+
+    # Assume the word is a symbol
+    return Symbol(word)
 
 
 def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
@@ -124,7 +190,7 @@ def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
             elif char == ')':
                 # End a symbol or int literal and add to result
                 if symbol_or_int:
-                    result_stack[-1].append(_parse_symbol_or_int(symbol_or_int))
+                    result_stack[-1].append(_parse_symbol_or_int(buf, symbol_or_int))
                     symbol_or_int = ''
 
                 temp = result_stack.pop()
@@ -133,7 +199,7 @@ def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
             elif char in WORD_SEPARATORS:
                 # End a symbol or int literal and add to result
                 if symbol_or_int:
-                    result_stack[-1].append(_parse_symbol_or_int(symbol_or_int))
+                    result_stack[-1].append(_parse_symbol_or_int(buf, symbol_or_int))
                     symbol_or_int = ''
                 # Otherwise, ignore the whitespace char
 
@@ -177,8 +243,8 @@ def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
             raise Exception('Unreachable')
 
     if in_str:
-        raise ParseError('Reached EOF before termination of string literal')
+        buf.raise_parse_error('Reached EOF before termination of string literal')
     elif symbol_or_int or len(result_stack) > 1:
-        raise ParseError('Reached EOF before termination of s-expression')
+        buf.raise_parse_error('Reached EOF before termination of s-expression')
 
     return result_stack[0]
