@@ -39,7 +39,7 @@ class ParseBuffer:
         elif isinstance(str_or_buffer, io.TextIOWrapper):
             self.source_code = str_or_buffer.read()
         else:
-            raise ValueError('Unsupported input type for buffer')
+            raise ValueError('unsupported input type for buffer')
 
         self.file_name = file_name
 
@@ -215,13 +215,13 @@ def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
 
     if in_str:
         buf.raise_error(
-            'Reached EOF before termination of string literal',
+            'reached EOF before termination of string literal',
             line_offset=-1,
             col_offset=-1,
         )
     elif symbol_or_int or len(result_stack) > 1:
         buf.raise_error(
-            'Reached EOF before termination of s-expression',
+            'reached EOF before termination of s-expression',
             line_offset=-1,
             col_offset=-1,
         )
