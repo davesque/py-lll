@@ -2,9 +2,11 @@ import pprint
 
 import pytest
 
+from lll.exceptions import (
+    ParseError,
+)
 from lll.parser import (
     parse_s_exp,
-    ParseError,
 )
 
 
