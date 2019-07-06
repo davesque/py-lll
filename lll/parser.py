@@ -3,6 +3,7 @@ from typing import (
     Any,
     Iterator,
     List,
+    Optional,
     TextIO,
     Union,
 )
@@ -20,30 +21,25 @@ class ParseError(Exception):
 
 class ParseBuffer:
     """
-    Buffer class used to track position of parsing operations as well as
-    contextual information about that position.
+    Used to iterate over content to be parsed while tracking parsing position.
     """
-    __slots__ = ('buf', 'line_no', 'col_no', 'curr_line')
+    __slots__ = ('content', 'line_no', 'col_no')
 
-    buf: TextIO
+    content: str
     line_no: int
     col_no: int
-    curr_line: str
 
     def __init__(self, str_or_buffer: Union[str, TextIO]):
         if isinstance(str_or_buffer, str):
-            self.buf = io.StringIO(str_or_buffer)
+            self.content = str_or_buffer
         elif isinstance(str_or_buffer, io.TextIOWrapper):
-            self.buf = str_or_buffer
+            self.content = str_or_buffer.read()
         else:
             raise ValueError('Unsupported input type for buffer')
 
         # Parsing position
         self.line_no = 1
         self.col_no = 1
-
-        # Content of current line
-        self.curr_line = self.buf.readline()
 
     def _handle_char(self, char: str) -> None:
         if char == '\n':
@@ -53,14 +49,9 @@ class ParseBuffer:
             self.col_no += 1
 
     def __iter__(self) -> Iterator[str]:
-        buf = self.buf
-
-        while self.curr_line:
-            for char in self.curr_line:
-                yield char
-                self._handle_char(char)
-
-            self.curr_line = buf.readline()
+        for char in self.content:
+            yield char
+            self._handle_char(char)
 
 
 class symbol(str):
