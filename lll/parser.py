@@ -21,8 +21,8 @@ WORD_SEPARATORS = {' ', '\t', '\n'}
 
 class ParseBuffer:
     """
-    Used to iterate over source code to be parsed while tracking parsing
-    position.
+    A buffer that iterates a source code string character by character while
+    tracking the line and column offsets into the string.
     """
     __slots__ = ('source_code', 'file_name', 'line_offset', 'col_offset')
 
@@ -76,14 +76,14 @@ class ParseBuffer:
 
 class Symbol(str):
     """
-    String subclass that represents a parsed symbol (unquoted string) in an
+    A string subclass that represents a parsed symbol (unquoted string) in an
     s-expression. For example, in the following s-expression
     ::
 
       (foo "bar" 1)
 
-    the character sequence `foo` is a symbol whereas the character sequence
-    `"bar"` is a string literal.
+    the character sequence ``foo`` is a symbol whereas the character sequence
+    ``"bar"`` is a string literal.
     """
     def __repr__(self) -> str:
         return str(self)
