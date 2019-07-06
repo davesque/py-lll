@@ -60,10 +60,10 @@ class ParseBuffer:
             self._handle_char(char)
 
     def raise_error(self,
-                          msg: str,
-                          line_offset: int = None,
-                          col_offset: int = None,
-                          mark_size: int = 1) -> None:
+                    msg: str,
+                    line_offset: int = None,
+                    col_offset: int = None,
+                    mark_size: int = 1) -> None:
         raise ParseError(
             msg,
             self.source_code,
