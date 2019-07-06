@@ -59,7 +59,7 @@ class ParseBuffer:
             yield char
             self._handle_char(char)
 
-    def raise_parse_error(self,
+    def raise_error(self,
                           msg: str,
                           line_offset: int = None,
                           col_offset: int = None,
@@ -110,7 +110,7 @@ def _parse_symbol_or_int(buf: ParseBuffer, word: str) -> Union[int, str]:
             # Try to parse this word as an integer with the appropriate base
             return int(word, base)
     except ValueError:
-        buf.raise_parse_error(
+        buf.raise_error(
             f'invalid literal for int with base {base}: {repr(word)}',
             col_offset=buf.col_offset - 1,
             mark_size=len(word),
@@ -214,13 +214,13 @@ def parse_s_exp(str_or_buffer: Union[str, TextIO]) -> SExprList:
             raise Exception('Unreachable')
 
     if in_str:
-        buf.raise_parse_error(
+        buf.raise_error(
             'Reached EOF before termination of string literal',
             line_offset=-1,
             col_offset=-1,
         )
     elif symbol_or_int or len(result_stack) > 1:
-        buf.raise_parse_error(
+        buf.raise_error(
             'Reached EOF before termination of s-expression',
             line_offset=-1,
             col_offset=-1,
