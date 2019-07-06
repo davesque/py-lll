@@ -119,7 +119,6 @@ class ParseBuffer:
         )
 
 
-
 class Symbol(str):
     """
     String subclass that represents a parsed symbol (unquoted string) in an
