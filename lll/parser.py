@@ -52,14 +52,14 @@ class ParseError(Exception):
         else:
             prefix = 'line '
 
+        line_no = self.line_offset + 1
+        col_no = self.col_offset + 1
+
         line = self.source_lines[self.line_offset]
 
         # Error mark reaches back from column offset
         mark = ' ' * (self.col_offset - self.mark_size + 1)
         mark += '^' * self.mark_size
-
-        line_no = self.line_offset + 1
-        col_no = self.col_offset + 1
 
         return f'{prefix}{line_no}:{col_no}: {self.msg}\n{line}\n{mark}'
 
