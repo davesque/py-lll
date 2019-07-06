@@ -17,14 +17,12 @@ def get_sexp_repr(obj):
 
 def test_parse_buffer_yields_source_code_characters(get_fixture_contents):
     source_code = get_fixture_contents('string_literals.lll.lisp')
-    buf_it = iter(ParseBuffer(source_code))
+
+    buf = iter(ParseBuffer(source_code))
 
     res = []
-    while True:
-        try:
-            res.append(next(buf_it))
-        except StopIteration:
-            break
+    for char in buf:
+        res.append(char)
 
     assert ''.join(res) == source_code
 
